@@ -1,0 +1,37 @@
+{
+    "name": "Dead Head 43",
+    "symbol": "",
+    "description": "",
+    "seller_fee_basis_points": 500,
+    "image": "https://www.arweave.net/w7lwaUtw3OJoXFQW6oqnK-VGpE_YnqS-qKnv4MOU6B8?ext=jpg",
+    "attributes": [
+        {
+            "value": "Pit Vipers"
+        },
+        {
+            "value": "Cap (Ghost)"
+        },
+        {
+            "value": "White Skull"
+        },
+        {
+            "value": "Red Background"
+        }
+    ],
+    "external_url": "",
+    "properties": {
+        "files": [
+            {
+                "uri": "https://www.arweave.net/w7lwaUtw3OJoXFQW6oqnK-VGpE_YnqS-qKnv4MOU6B8?ext=jpg",
+                "type": "image/jpeg"
+            }
+        ],
+        "category": "image",
+        "creators": [
+            {
+                "address": "2BNABAPHhYAxjpWRoKKnTsWT24jELuvadmZALvP6WvY4",
+                "share": 100
+            }
+        ]
+    }
+}
