@@ -3,23 +3,28 @@
 
 Smol repo for updating NFTs:
 
+## Check for invalid NFTs
 
-# get
-
+run:
 ```
-ts-node nftutil.ts get --mint_addr 62iYQXP1WCrKxwy5EWsXmso1uB3HuPECYBeh8wEo6veb --cluster devnet
-ts-node nftutil.ts get --metadata_addr 7mpNHvoEGCj2H9mJsej9orCVtQpcN8wqzBB26aGw6f3g --cluster devnet
-```
-
-# create
-only works for devnet currently...
-
-```
-ts-node nftutil.ts create --image_path test_nft/dead_head43.jpg --json_path test_nft/dead_head43.json --payer_keypair_path test_key.json --cluster devnet
+cd /path/to/nftutils/
+python -u nftfix.py validate --cmids cmids.txt --refresh
 ```
 
-# update
+This creates a directory `./cmids` where it stores data on whether the nft metadata for nfts is valid or invalid
+
+
+## Upload fixed metadata
 
 ```
-ts-node nftutil.ts update --nft_mints_file test_nft_mints.devnet.json --new_json_uri https://arweave.net/KtwKVI_d_5uV_UllZRe4tLViA5XqX_0r_jTfSXWeiW4 --cluster devnet
+ts-node nftutil.ts upload --file_path cmids/<cmid> --payer_keypath path/to/keypair.json --cluster [mainnet-beta|devnet]
 ```
+
+## Update invalid nfts
+```
+ts-node nftutil.ts update --payer path/to/payerkeypair.json --update_authority path/to/update_authority.json --data_dir cmids/<cmid> --cluster [mainnet-beta|devnet]
+```
+
+Be sure to re-run nftfix.py with --refresh before the next run
+
+TODO: make a single python command that refreshes and calls the other ts-node commands as needed
