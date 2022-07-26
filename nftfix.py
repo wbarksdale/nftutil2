@@ -8,6 +8,8 @@ import random
 import os
 from pathlib import Path
 
+from importlib_metadata import metadata
+
 HOLAPLEX_INDEXER_POSTGRES_URL = str(os.environ.get("HOLAPLEX_INDEXER_POSTGRES_URL"))
 
 # Fetch an nft metadata json with retry
@@ -178,10 +180,56 @@ def validate(args):
 
 
 def upload(args):
-    pass
+    cmids_path = Path("./cmids")
+    for dir in cmids_path.iterdir():
+        if not os.path.isdir(dir):
+            continue
+
+        metadata_path = dir / "metadata.json"
+        metadata_upload_stamp = dir / f"metadata.json.upload.{args.cluster}"
+
+        if metadata_path.exists() and not metadata_upload_stamp.exists():
+            print(f"Uploading: {metadata_path}")
+            command = [
+                "ts-node", "nftutil.ts", "upload", 
+                "--file_path", str(metadata_path),
+                "--payer_keypath", args.payer,
+                "--cluster", args.cluster,
+            ]
+            subprocess.check_call(command)
 
 def update(args):
-    pass
+    cmids_path = Path("./cmids")
+    for dir in cmids_path.iterdir():
+        if not os.path.isdir(dir):
+            continue
+        
+        metadata_path = dir / "metadata.json"
+        metadata_upload_stamp = dir / f"metadata.json.upload.{args.cluster}"
+
+        if not metadata_upload_stamp.exists():
+            # print(f"nothing to do for: {dir}")
+            continue
+
+        with open(metadata_upload_stamp) as f:
+            metadata_fixed_url = f.read()
+
+        command = [
+            "ts-node", "nftutil.ts", "update",
+            "--payer", args.payer,
+            "--update_authority", args.payer,
+            "--data_dir", str(dir),
+            "cluster", args.cluster
+        ]
+        print(metadata_fixed_url)
+        print(command)
+        # subprocess.check_call(command)
+
+def runall(args):
+    args.__setattr__("refresh", True) 
+    validate(args)
+    upload(args)
+    update(args)
                         
 def main():
     parser = argparse.ArgumentParser()
@@ -194,13 +242,22 @@ def main():
     validate_parser.set_defaults(func=validate)
 
     upload_parser = subparsers.add_parser("upload", help="upload nft metadatas that need to be uploaded in cmids directory")
-    upload_parser.add_argument("--cmids", help="path to cmids directory with output from 'validate' command")
+    upload_parser.add_argument("--cluster", choices=["mainnet-beta", "devnet"], default="devnet", help="cluster name (mainnet-beta or devnet)")
     upload_parser.add_argument("--payer", help="path to keypair that will pay for the upload")
+    upload_parser.set_defaults(func=upload)
 
     update_parser = subparsers.add_parser("update", help="update nft metadatas using the output from cmids directory")
-    update_parser.add_argument("--cmids", help="path to cmids directory with output from 'validate' and 'update' command")
+    update_parser.add_argument("--cluster", choices=["mainnet-beta", "devnet"], default="devnet", help="cluster name (mainnet-beta or devnet)")
     update_parser.add_argument("--payer", help="path to keypair that will pay for the upload")
     update_parser.add_argument("--update_authority", help="path to keypair that is the update authority for the nft")
+    update_parser.set_defaults(func=update)
+
+    runall_parser = subparsers.add_parser("runall", help="run a full update cycle (validate -> upload -> update)")
+    runall_parser.add_argument("--cmids", help="path to text file containing list of candy machine pubkeys separated by newlines")
+    runall_parser.add_argument("--cluster", choices=["mainnet-beta", "devnet"], default="devnet", help="cluster name (mainnet-beta or devnet)")
+    runall_parser.add_argument("--payer", help="path to keypair that will pay for the upload")
+    runall_parser.add_argument("--update_authority", help="path to keypair that is the update authority for the nft")
+    runall_parser.set_defaults(func=runall)
  
     args = parser.parse_args()
 

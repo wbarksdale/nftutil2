@@ -34,7 +34,8 @@ export const updateCommand = {
         .option("cluster", {
             description: "cluster to generate NFTs on",
             type: "string", 
-            default: "devnet"
+            choices: ["devnet", "mainnet-beta"],
+            default: "devnet",
         })
     },
     handler: async (args: ArgumentsCamelCase<UpdateCommandArgs>) => {
@@ -58,6 +59,11 @@ export const updateCommand = {
         })
 
         console.log("Found", mintIds.length, "invalid mint ids")
+        
+        if (mintIds.length == 0) {
+            console.log("nothing to do")
+            return
+        }
 
         if (!files.includes('metadata.json')) {
             console.log("Missing metadata.json")

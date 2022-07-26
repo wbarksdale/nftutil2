@@ -62,7 +62,7 @@ export const uploadFileCommand = {
 
             // Save the url in a file that is just the input file + .upload.{cluster}
             const uploadResultFile = args.file_path + ".upload." + args.cluster
-            console.log("Saving upload result url to" + uploadResultFile)
+            console.log("Saving upload result url to " + uploadResultFile)
             fs.writeFileSync(uploadResultFile, arweaveUrl)
         }
     }
