@@ -7,7 +7,8 @@ import path from 'path'
 import { loadKeyFromPath } from './utils';
 
 export type CreateCommandArgs =
-    { payer_keypair_path: string } &
+    { payer: string } &
+    { update_authority: string} &
     { image_path: string } &
     { json_path: string } &
     { cluster: string }
@@ -17,8 +18,13 @@ export const createCommand = {
     command: "create",
     description: "create an nft",
     builder: (args: Argv): Argv<CreateCommandArgs> => {
-        return args.option("payer_keypair_path", {
-            description: "path to keypair to be used as payer",
+        return args.option("payer", {
+            description: "path to payer keypair json",
+            type: "string",
+            required: true,
+        })
+        .option("update_authority", {
+            description: "path to keypair to use as update authority",
             type: "string",
             required: true,
         })
@@ -42,7 +48,8 @@ export const createCommand = {
     handler: async (args: ArgumentsCamelCase<CreateCommandArgs>) => {
         console.log("create with args: ", args)
 
-        const payerKeypair = loadKeyFromPath(args.payer_keypair_path)
+        const payerKeypair = loadKeyFromPath(args.payer)
+        const updateAuthorityKeypair = loadKeyFromPath(args.update_authority)
 
         console.log("using payer: ", payerKeypair.publicKey.toBase58())
 
@@ -102,6 +109,7 @@ export const createCommand = {
                 uri: nftMetadataUri,
                 name: "My Nft",
                 sellerFeeBasisPoints: 500,
+                updateAuthority: updateAuthorityKeypair,
             })
             .run()
 

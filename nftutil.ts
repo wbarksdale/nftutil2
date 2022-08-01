@@ -4,6 +4,7 @@ import { getCommand } from './cli/getnft'
 import { updateCommand } from './cli/updatenfts'
 import { uploadFileCommand } from './cli/uploadfile'
 import { createCandyMachineCommand } from './cli/createCandyMachine'
+import { gqlUpdateNft } from './cli/gqlUpdateNfts'
 
 yargs
     .command(getCommand)
@@ -11,6 +12,7 @@ yargs
     .command(createCommand)
     .command(uploadFileCommand)
     .command(createCandyMachineCommand)
+    .command(gqlUpdateNft)
 
 yargs.demandCommand()
 yargs.argv
