@@ -92,7 +92,9 @@ export const gqlUpdateNft = {
                     newMetadataJson: $newMetadataJson
                     cluster: $cluster
               ) {
-                message, 
+                success,
+                message,
+                processId, 
                 newUri
               }
             }
